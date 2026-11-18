@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LabReserve — Digital Lab Equipment Booking</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-mark">LR</div>
+      <div class="eyebrow">LABRESERVE PORTAL</div>
+      <h1>Welcome back</h1>
+      <p class="muted">Digital Lab Equipment Booking Portal</p>
+      <form id="login-form">
+        <label for="registration">Registration ID</label>
+        <input id="registration" autocomplete="username" placeholder="e.g. 23BCE1234" required />
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required />
+        <button class="primary full" type="submit">Sign in <span>→</span></button>
+      </form>
+      <div class="demo-note"><span class="dot"></span> Academic prototype · Demo login accepts any non-empty ID/password</div>
+    </div>
+  </div>
+
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark small">LR</div><div><strong>LabReserve</strong><small>LAB BOOKING PORTAL</small></div></div>
+      <nav>
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span> Dashboard</button>
+        <button class="nav-item" data-view="equipment"><span>▣</span> Equipment</button>
+        <button class="nav-item" data-view="book"><span>＋</span> Book Equipment</button>
+        <button class="nav-item" data-view="bookings"><span>▤</span> My Bookings</button>
+        <button class="nav-item" data-view="admin"><span>⚙</span> Admin Panel</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="user-chip"><div class="avatar">ST</div><div><strong id="user-name">Student</strong><small>Student account</small></div></div><button id="logout" class="logout"><span>↪</span> Logout</button></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="mobile-brand"><div class="brand-mark small">LR</div><strong>LabReserve</strong></div><div class="topbar-right"><span class="status-pill"><i></i> Portal operational</span><div class="avatar">ST</div></div></header>
+      <div class="content">
+        <section class="view" id="view-dashboard">
+          <div class="page-heading"><div><p class="eyebrow">OVERVIEW</p><h1>Dashboard</h1><p class="muted">Manage your laboratory equipment reservations.</p></div><button class="primary" data-goto="book">＋ New booking</button></div>
+          <div class="stats-grid"><div class="stat-card"><div class="stat-icon blue">▣</div><div class="stat-label">Available equipment</div><div class="stat-value" id="stat-equipment">6</div><div class="stat-foot">In the catalogue</div></div><div class="stat-card"><div class="stat-icon violet">▤</div><div class="stat-label">My bookings</div><div class="stat-value" id="stat-bookings">0</div><div class="stat-foot">Total requests</div></div><div class="stat-card"><div class="stat-icon amber">◷</div><div class="stat-label">Pending requests</div><div class="stat-value" id="stat-pending">0</div><div class="stat-foot">Awaiting review</div></div><div class="stat-card"><div class="stat-icon green">↗</div><div class="stat-label">Booking access</div><div class="stat-value">24/7</div><div class="stat-foot">Submit any time</div></div></div>
+          <div class="section-heading"><div><h2>Featured equipment</h2><p class="muted">Explore equipment available for your next lab session.</p></div><button class="text-button" data-goto="equipment">View catalogue →</button></div>
+          <div class="featured-grid" id="featured-grid"></div>
+          <div class="section-heading"><div><h2>Recent booking activity</h2><p class="muted">Your latest reservation requests.</p></div><button class="text-button" data-goto="bookings">View history →</button></div><div class="panel empty-panel" id="dashboard-empty"><div class="empty-icon">▤</div><strong>No booking activity yet</strong><p>Book equipment to see your requests here.</p><button class="secondary" data-goto="book">Create your first booking</button></div>
+        </section>
+        <section class="view hidden" id="view-equipment"><div class="page-heading"><div><p class="eyebrow">CATALOGUE</p><h1>Equipment Catalogue</h1><p class="muted">Browse lab equipment available for reservation.</p></div></div><div class="search-row"><input id="search" placeholder="⌕  Search equipment..."/><select id="category-filter"><option value="all">All categories</option><option>Electronics</option><option>Measurement</option><option>Computing</option><option>Optics</option></select></div><div class="equipment-grid" id="equipment-grid"></div></section>
+        <section class="view hidden" id="view-book"><div class="page-heading"><div><p class="eyebrow">RESERVATION REQUEST</p><h1>Book Equipment</h1><p class="muted">Fill in the details to request a lab equipment booking.</p></div></div><div class="panel booking-panel"><form id="booking-form"><div class="form-grid"><div class="field full"><label for="equipment-select">Equipment</label><select id="equipment-select" required><option value="">Choose equipment</option></select></div><div class="field"><label for="booking-date">Date</label><input type="date" id="booking-date" required /></div><div class="field"><label for="booking-time">Time slot</label><select id="booking-time" required><option value="">Choose time</option><option>09:00 – 10:00</option><option>10:00 – 11:00</option><option>11:00 – 12:00</option><option>12:00 – 13:00</option><option>13:00 – 14:00</option><option>14:00 – 15:00</option><option>15:00 – 16:00</option><option>16:00 – 17:00</option></select></div><div class="field full"><label for="purpose">Purpose</label><textarea id="purpose" rows="4" placeholder="Enter experiment / project purpose" required></textarea></div></div><div class="form-actions"><span class="muted tiny">Requests are saved locally in this demo.</span><button class="primary" type="submit">Submit Booking Request →</button></div></form></div></section>
+        <section class="view hidden" id="view-bookings"><div class="page-heading"><div><p class="eyebrow">RESERVATIONS</p><h1>My Bookings &amp; History</h1><p class="muted">Track your submitted equipment booking requests.</p></div><button class="secondary" id="refresh-bookings">↻ Refresh</button></div><div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Equipment</th><th>Date</th><th>Time</th><th>Purpose</th><th>Status</th></tr></thead><tbody id="booking-table"></tbody></table></div><div id="bookings-empty" class="empty-panel"><div class="empty-icon">▤</div><strong>No bookings found</strong><p>Your booking history will appear here.</p><button class="secondary" data-goto="book">Book equipment</button></div></div></section>
+        <section class="view hidden" id="view-admin"><div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h1>Admin Panel</h1><p class="muted">Demo administration view for project presentation.</p></div></div><div class="panel admin-info"><div class="stat-icon amber">⚙</div><h2>Demo administration</h2><p>This is a front-end academic prototype. Booking records are stored in this browser and there is no connected server or administrator authentication.</p><button class="secondary" id="admin-refresh">↻ Refresh demo data</button></div><div class="stats-grid admin-stats"><div class="stat-card"><div class="stat-label">Total demo bookings</div><div class="stat-value" id="admin-total">0</div></div><div class="stat-card"><div class="stat-label">Awaiting review</div><div class="stat-value" id="admin-awaiting">0</div></div></div></section>
+      </div>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

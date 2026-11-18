@@ -1,0 +1,25 @@
+const equipment = [
+ {name:'Digital Oscilloscope',category:'Electronics',icon:'〰️',desc:'Visualize and analyze electronic signal waveforms.',room:'Electronics Lab',code:'EL-04'},
+ {name:'Digital Multimeter',category:'Measurement',icon:'🔌',desc:'Measure voltage, current, resistance and continuity.',room:'Electronics Lab',code:'EL-02'},
+ {name:'Arduino Uno Kit',category:'Computing',icon:'🟩',desc:'Microcontroller board for prototyping and embedded projects.',room:'Innovation Lab',code:'IL-07'},
+ {name:'Optical Bench',category:'Optics',icon:'🔭',desc:'Optics setup for light, lens and alignment experiments.',room:'Physics Lab',code:'PH-11'},
+ {name:'Function Generator',category:'Electronics',icon:'📈',desc:'Generate selectable electrical waveforms for experiments.',room:'Electronics Lab',code:'EL-08'},
+ {name:'Vernier Caliper',category:'Measurement',icon:'📏',desc:'Precision instrument for measuring dimensions.',room:'Workshop Lab',code:'WS-03'}
+];
+let bookings = JSON.parse(localStorage.getItem('labreserve_bookings')||'[]');let currentUser='Student';
+const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+function save(){localStorage.setItem('labreserve_bookings',JSON.stringify(bookings));updateStats();renderBookings()}
+function equipmentCard(item){return `<article class="equipment-card"><div class="equipment-top"><div class="equipment-symbol">${item.icon}</div><span class="availability">Available</span></div><h3>${item.name}</h3><p>${item.desc}</p><div class="equipment-meta"><span>${item.room} · ${item.code}</span><button data-book-item="${item.name}">Book →</button></div></article>`}
+function renderEquipment(){const q=($('#search')?.value||'').toLowerCase(),cat=$('#category-filter')?.value||'all';const filtered=equipment.filter(e=>(e.name+' '+e.desc+' '+e.category).toLowerCase().includes(q)&&(cat==='all'||e.category===cat));$('#equipment-grid').innerHTML=filtered.map(equipmentCard).join('')||'<div class="panel empty-panel">No matching equipment found.</div>';$('#featured-grid').innerHTML=equipment.slice(0,3).map(equipmentCard).join('');$('#equipment-select').innerHTML='<option value="">Choose equipment</option>'+equipment.map(e=>`<option>${e.name}</option>`).join('')}
+function updateStats(){const total=bookings.length,pending=bookings.filter(b=>b.status==='Pending').length;$('#stat-equipment').textContent=equipment.length;$('#stat-bookings').textContent=total;$('#stat-pending').textContent=pending;$('#admin-total').textContent=total;$('#admin-awaiting').textContent=pending;$('#dashboard-empty').classList.toggle('hidden',total>0)}
+function renderBookings(){const tbody=$('#booking-table');tbody.innerHTML=bookings.slice().reverse().map(b=>`<tr><td><strong>${b.equipment}</strong></td><td>${b.date}</td><td>${b.time}</td><td title="${b.purpose}">${b.purpose.length>30?b.purpose.slice(0,30)+'…':b.purpose}</td><td><span class="booking-status">${b.status}</span></td></tr>`).join('');$('#bookings-empty').classList.toggle('hidden',bookings.length>0)}
+function showView(view){$$('.view').forEach(el=>el.classList.add('hidden'));$('#view-'+view)?.classList.remove('hidden');$$('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.view===view));if(view==='bookings')renderBookings();if(view==='equipment')renderEquipment();window.scrollTo(0,0)}
+$('#login-form').addEventListener('submit',e=>{e.preventDefault();currentUser=$('#registration').value.trim()||'Student';$('#user-name').textContent=currentUser;$('#login-screen').classList.add('hidden');$('#app').classList.remove('hidden');renderEquipment();updateStats();renderBookings();toast('Signed in to the demo portal')});
+$$('.nav-item').forEach(btn=>btn.addEventListener('click',()=>showView(btn.dataset.view)));
+document.addEventListener('click',e=>{const go=e.target.closest('[data-goto]');if(go)showView(go.dataset.goto);const book=e.target.closest('[data-book-item]');if(book){$('#equipment-select').value=book.dataset.bookItem;showView('book')}});
+$('#logout').addEventListener('click',()=>{$('#app').classList.add('hidden');$('#login-screen').classList.remove('hidden');$('#password').value='';toast('You have logged out')});
+$('#search').addEventListener('input',renderEquipment);$('#category-filter').addEventListener('change',renderEquipment);
+$('#booking-form').addEventListener('submit',e=>{e.preventDefault();const record={equipment:$('#equipment-select').value,date:$('#booking-date').value,time:$('#booking-time').value,purpose:$('#purpose').value.trim(),status:'Pending',created:Date.now()};bookings.push(record);save();e.target.reset();toast('Booking request submitted!');showView('bookings')});
+$('#refresh-bookings').addEventListener('click',()=>{renderBookings();toast('Bookings refreshed')});$('#admin-refresh').addEventListener('click',()=>{updateStats();renderBookings();toast('Demo data refreshed')});
+$('#booking-date').min=new Date().toISOString().slice(0,10);renderEquipment();updateStats();renderBookings();
